@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggiungi Canzone</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <h2>Aggiungi una nuova canzone</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Titolo:</label><br>
+        <input type="text" name="title" required><br>
+        <label>Artista:</label><br>
+        <input type="text" name="artist" required><br>
+        <label>File audio:</label><br>
+        <input type="file" name="audio" accept="audio/*" required><br>
+        <button type="submit">Carica</button>
+    </form>
+    <a href="{{ url_for('home') }}">Torna alla Home</a>
+</body>
+</html>
