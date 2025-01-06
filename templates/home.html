@@ -4,27 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles.css') }}">
+
 </head>
 <body>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <script>
-                {% for category, message in messages %}
-                Swal.fire({
-                    icon: '{{ "success" if category == "success" else "error" }}',
-                    title: '{{ message }}',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-                {% endfor %}
-            </script>
-        {% endif %}
-    {% endwith %}
-    
-    <h2>Benvenuto, {{ username }}!</h2>
-    <a href="{{ url_for('logout') }}">Logout</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">GRL Music</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Benvenuto, {{ username }}!</h1>
+        <div class="row">
+            {% for song in songs %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ song.title }}</h5>
+                        <p class="card-text">Artista: {{ song.artist }}</p>
+                        <a href="/uploads/{{ song.filename }}" class="btn btn-primary">Ascolta</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/add_song" class="btn btn-success">Aggiungi Canzone</a>
+        </div>
+    </div>
 </body>
 </html>
