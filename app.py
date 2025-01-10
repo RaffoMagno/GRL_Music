@@ -11,7 +11,7 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-app.config["MONGO_URI"] = "mongodb://localhost:27017/musicDB"
+app.config["ClusterRG"] = "mongodb+srv://garilliriccardo:<db_password>@clusterrg.qozli.mongodb.net/"
 app.secret_key = os.urandom(24) 
 mongo = PyMongo(app)
 
