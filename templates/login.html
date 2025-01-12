@@ -8,10 +8,26 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='/styles.css') }}">
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <script>
+                        {% for category, message in messages %}
+                        Swal.fire({
+                            icon: '{{ "success" if category == "success" else "error" }}',
+                            title: '{{ message }}',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        {% endfor %}
+                    </script>
+                {% endif %}
+            {% endwith %}
+
     <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
         <div class="card p-4" style="width: 400px;">
             <h2 class="text-center mb-4">Accedi</h2>
-            <form action="/" method="POST">
+            <form method="POST">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username" name="username" required>

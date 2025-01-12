@@ -1,21 +1,9 @@
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
-class User(UserMixin):
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+db = SQLAlchemy()
 
-    def get_id(self):
-        return self.username
-
-    @classmethod
-    def get(cls, username):
-        from app import mongo  
-        user_data = mongo.db.users.find_one({"username": username})
-        if user_data:
-            return cls(user_data["username"], user_data["password"])
-        return None
-
-
-
-
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
