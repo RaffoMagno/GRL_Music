@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from models import db, User
 from flask_bcrypt import Bcrypt
+import re
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -34,6 +35,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        #if controllaPassword(password) == True: DA CONTROLLARE
         if User.query.filter_by(username=username).first():
             flash("Questo username è già in uso.", "error")
             return render_template('register.html')
@@ -63,7 +65,7 @@ def login():
 @app.route('/indietro', methods=['GET'])
 def indietro():
     return redirect(url_for('home'))
-    
+
 @app.route('/add_song', methods=['GET', 'POST'])
 @login_required
 def add_song():
@@ -87,6 +89,24 @@ def add_song():
             return redirect(url_for('home'))
 
     return render_template('add_song.html')
+
+def controllaPassword(password):
+    if len(password) < 8:
+        flash("La password deve contenere almeno 8 caratteri.", "error")
+        return False
+    if not re.search(r"[A-Z]", password):
+        flash("La password deve contenere almeno una lettera maiuscola.", "error")
+        return False
+    if not re.search(r"[a-z]", password):
+        flash("La password deve contenere almeno una lettera minuscola.", "error")
+        return False
+    if not re.search(r"[0-9]", password):
+        flash("La password deve contenere almeno un numero.", "error")
+        return False
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        flash("La password deve contenere almeno un carattere speciale.", "error")
+        return False
+    return True
 
 with app.app_context():
     db.create_all()
