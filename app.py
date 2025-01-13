@@ -35,17 +35,18 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        #if controllaPassword(password) == True: DA CONTROLLARE
-        if User.query.filter_by(username=username).first():
-            flash("Questo username è già in uso.", "error")
-            return render_template('register.html')
 
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Registrazione avvenuta con successo!", "success")
-        return redirect(url_for('login'))
+        if controllaPassword(password):
+            if User.query.filter_by(username=username).first():
+                flash("Questo username è già in uso.", "error")
+                return render_template('register.html')
+
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            new_user = User(username=username, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Registrazione avvenuta con successo!", "success")
+            return redirect(url_for('login'))
     return render_template('register.html')
 
 @app.route('/', methods=['GET', 'POST'])
