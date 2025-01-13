@@ -60,6 +60,30 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html')
 
+@app.route('/add_song', methods=['GET', 'POST'])
+@login_required
+def add_song():
+    if request.method == 'POST':
+        title = request.form['title']
+        artist = request.form['artist']
+        audio_file = request.files['audio']
+
+        if audio_file:
+            filename = audio_file.filename
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            audio_file.save(filepath)
+
+            song_data = {
+                'title': title,
+                'artist': artist,
+                'filename': filename
+            }
+            songs_collection.insert_one(song_data)
+            flash("Canzone aggiunta con successo!", "success")
+            return redirect(url_for('home'))
+
+    return render_template('add_song.html')
+
 with app.app_context():
     db.create_all()
 
