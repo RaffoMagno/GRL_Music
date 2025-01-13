@@ -60,6 +60,10 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html')
 
+@app.route('/indietro', methods=['GET'])
+def indietro():
+    return redirect(url_for('home'))
+    
 @app.route('/add_song', methods=['GET', 'POST'])
 @login_required
 def add_song():
