@@ -9,6 +9,22 @@
 
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <script>
+                        {% for category, message in messages %}
+                        Swal.fire({
+                            icon: '{{ "success" if category == "success" else "error" }}',
+                            title: '{{ message }}',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        {% endfor %}
+                    </script>
+                {% endif %}
+            {% endwith %}
+            
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <p class="navbar-brand" style="margin-top: auto; margin-bottom: auto;">GRL Music</p>
@@ -34,11 +50,12 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ song.title }}</h5>
                         <p class="card-text">Artista: {{ song.artist }}</p>
-                        <a href="/uploads/{{ song.filename }}" class="btn btn-primary">Ascolta</a>
+                        <a target="_blank" href="{{ url_for('play_song', filename=song['filename']) }}" class="btn btn-primary">Riproduci</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
+
         </div>
         <div class="text-center mt-4">
             <a href="/add_song" class="btn btn-success">Aggiungi Canzone</a>

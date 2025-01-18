@@ -1,15 +1,29 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_pymongo import PyMongo
 from models import db, User
 from flask_bcrypt import Bcrypt
+import os
 import re
+from flask import send_from_directory
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = 'key_sessione_user'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 
+# Configurazione database relazionale
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db.init_app(app)
+
+# Configurazione database MongoDB
+app.config["MONGO_URI"] = "mongodb://localhost:27017/musicDB"
+mongo = PyMongo(app)
+
+# Configurazione cartella di upload
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -21,7 +35,9 @@ def load_user(user_id):
 @app.route('/home')
 @login_required
 def home():
-    return render_template('home.html', username=current_user.username)
+    # Recupera tutte le canzoni dal database MongoDB
+    songs = list(mongo.db.songs.find())
+    return render_template('home.html', username=current_user.username, songs=songs)
 
 @app.route('/logout')
 @login_required
@@ -57,7 +73,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
-            flash("Login effettuato con successo!", "success")
+            #flash("Login effettuato con successo!", "success")
             return redirect(url_for('home'))
         flash("Credenziali non valide!", "error")
         return redirect(url_for('login'))
@@ -80,16 +96,26 @@ def add_song():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             audio_file.save(filepath)
 
-            song_data = {
+            # Salva i dati nel database MongoDB
+            mongo.db.songs.insert_one({
                 'title': title,
                 'artist': artist,
                 'filename': filename
-            }
-            songs_collection.insert_one(song_data)
+            })
             flash("Canzone aggiunta con successo!", "success")
             return redirect(url_for('home'))
 
     return render_template('add_song.html')
+
+@app.route('/play/<filename>', methods=['GET'])
+@login_required
+def play_song(filename):
+    # Restituisce il file audio dalla cartella di upload
+    try:
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    except FileNotFoundError:
+        flash("File non trovato.", "error")
+        return redirect(url_for('home'))
 
 def controllaPassword(password):
     if len(password) < 8:
